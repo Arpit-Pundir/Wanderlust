@@ -1,0 +1,101 @@
+.starability-slot {
+    display: block;
+    position: relative;
+    width: 150px;
+    min-height: 30px;
+    padding: 0;
+    border: none;
+}
+
+/* Hide radio buttons */
+.starability-slot > input {
+    position: absolute;
+    opacity: 0;
+}
+
+/* Star labels */
+.starability-slot > label {
+    position: relative;
+    float: right;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 0;
+}
+
+/* Empty star */
+.starability-slot > label::before {
+    content: "★";
+    position: absolute;
+    font-size: 28px;
+    line-height: 30px;
+    color: #ddd;
+}
+
+/* Selected + hovered stars */
+.starability-slot > input:checked ~ label::before,
+.starability-slot > input:hover ~ label::before,
+.starability-slot > label:hover ~ label::before {
+    color: #ffc107;
+}
+
+/* Keyboard focus */
+.starability-slot > input:focus + label::before {
+    outline: 1px dotted #999;
+}
+
+/* Clear floated stars */
+.starability-slot::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+/* Display saved rating */
+.starability-result {
+    position: relative;
+    display: inline-block;
+    font-size: 0;
+}
+
+/* Empty rating stars */
+.starability-result::before {
+    content: "★★★★★";
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: #ddd;
+}
+
+/* Filled rating stars */
+.starability-result::after {
+    content: "★★★★★";
+    position: absolute;
+    left: 0;
+    top: 0;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: #ffc107;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* Rating widths */
+.starability-result[data-rating="1"]::after {
+    width: 20%;
+}
+
+.starability-result[data-rating="2"]::after {
+    width: 40%;
+}
+
+.starability-result[data-rating="3"]::after {
+    width: 60%;
+}
+
+.starability-result[data-rating="4"]::after {
+    width: 80%;
+}
+
+.starability-result[data-rating="5"]::after {
+    width: 100%;
+}
