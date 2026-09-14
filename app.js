@@ -29,6 +29,9 @@ const userRouter = require("./routes/user.js");
 // DATABASE URL
 const dbUrl = process.env.ATLASDB_URL;
 
+// PORT
+const port = process.env.PORT || 8080;
+
 // MONGO SESSION STORE
 const store = MongoStore.create({
     mongoUrl: dbUrl,
@@ -41,8 +44,9 @@ const store = MongoStore.create({
 });
 
 // SESSION STORE ERROR
-store.on("error", () => {
+store.on("error", (err) => {
     console.log("ERROR IN MONGO SESSION STORE");
+    console.log(err);
 });
 
 // SESSION OPTIONS
@@ -66,18 +70,6 @@ const sessionOptions = {
         httpOnly: true,
     },
 };
-
-main()
-    .then(() => {
-        console.log("connected to DB");
-    })
-    .catch((err) => {
-        console.log(err);
-    });
-
-async function main() {
-    await mongoose.connect(dbUrl);
-}
 
 // VIEW ENGINE
 app.set("view engine", "ejs");
@@ -149,7 +141,7 @@ app.use((req, res, next) => {
 
 // HOME
 app.get("/", (req, res) => {
-    res.redirect("/listings");
+    return res.redirect("/listings");
 });
 
 // ROUTES
@@ -170,25 +162,28 @@ app.use(
 
 // 404
 app.use((req, res, next) => {
-
-    next(
+    return next(
         new ExpressError(
             404,
             "Page Not Found"
         )
     );
-
 });
 
 // ERROR HANDLER
 app.use((err, req, res, next) => {
+
+    // Prevent sending a second response
+    if (res.headersSent) {
+        return next(err);
+    }
 
     const {
         statusCode = 500,
         message = "Something went wrong!",
     } = err;
 
-    res
+    return res
         .status(statusCode)
         .render(
             "listings/error.ejs",
@@ -196,12 +191,31 @@ app.use((err, req, res, next) => {
                 message,
             }
         );
-
 });
 
-// SERVER
-const port = process.env.PORT || 8080;
+// DATABASE + SERVER START
+async function main() {
+    await mongoose.connect(dbUrl);
+}
 
-app.listen(port, () => {
-    console.log(`server is listening on port ${port}`);
-});
+main()
+    .then(() => {
+
+        console.log("connected to DB");
+
+        app.listen(port, () => {
+            console.log(
+                `server is listening on port ${port}`
+            );
+        });
+
+    })
+    .catch((err) => {
+
+        console.log(
+            "DATABASE CONNECTION ERROR:"
+        );
+
+        console.log(err);
+
+    });
